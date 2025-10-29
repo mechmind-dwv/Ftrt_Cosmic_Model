@@ -1,0 +1,15 @@
+pandas
+numpy
+pandas
+matplotlib
+requests
+astropy
+skyfield
+scipy
+requests
+astroquery
+skyfield
+python-dateutil
+pytz
+jupyter
+bottleneck
