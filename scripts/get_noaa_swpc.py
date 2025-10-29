@@ -1,34 +1,22 @@
 """
-Compara FTRT con Kp/Dst: calcula correlaciones y genera gráficos.
+get_noaa_swpc.py
+Descarga datos de índice Kp desde NOAA SWPC y los guarda como CSV.
 """
+
+import requests
 import pandas as pd
-import matplotlib.pyplot as plt
-from scipy.stats import pearsonr
 
+def get_kp_data(output='data/raw/kp_today.csv'):
+    url = 'https://services.swpc.noaa.gov/json/planetary_k_index_1m.json'
+    print(f"🔭 Descargando datos desde {url}")
+    
+    r = requests.get(url, timeout=10)
+    r.raise_for_status()
 
-
-
-def run(ephem_csv='ephem.csv', kp_csv='kp_today.csv', ftrt_csv='ftrt_daily.csv'):
-f = pd.read_csv(ftrt_csv, parse_dates=['date'])
-k = pd.read_csv(kp_csv, parse_dates=['time_tag'], dayfirst=False)
-# normaliza nombres de columnas según la fuente
-# Ejemplo: k tiene columnas time_tag, kp
-k = k.rename(columns={k.columns[0]:'time_tag', k.columns[1]:'kp'})
-k['date'] = pd.to_datetime(k['time_tag']).dt.date
-f['date'] = pd.to_datetime(f['date']).dt.date
-merged = pd.merge(f.reset_index(), k[['date','kp']], on='date', how='left')
-merged['kp'] = pd.to_numeric(merged['kp'], errors='coerce')
-merged.dropna(subset=['kp'], inplace=True)
-r, p = pearsonr(merged['F_norm'], merged['kp'])
-print('Pearson r =', r, 'p =', p)
-plt.figure()
-plt.plot(merged['date'], merged['F_norm'], label='FTRT norm')
-plt.plot(merged['date'], merged['kp'], label='Kp')
-plt.legend()
-plt.xticks(rotation=45)
-plt.savefig('ftrt_vs_kp.png', bbox_inches='tight')
-print('Saved ftrt_vs_kp.png')
-
+    data = r.json()
+    df = pd.DataFrame(data)
+    df.to_csv(output, index=False)
+    print(f"✅ Datos Kp guardados en {output}")
 
 if __name__ == '__main__':
-run()
+    get_kp_data()

@@ -12,3 +12,4 @@ skyfield
 python-dateutil
 pytz
 jupyter
+bottleneck
