@@ -4,20 +4,12 @@ Obtiene efemérides planetarias desde el servicio JPL Horizons (NASA)
 para un rango de fechas dado. Guarda resultados en CSV.
 """
 
+import sys
 import pandas as pd
-from datetime import datetime, timedelta
 from astroquery.jplhorizons import Horizons
-import os
 
-def get_ephem(start_date=None, end_date=None):
-    # Si no se pasan fechas, usa últimos 10 días hasta hoy
-    if start_date is None or end_date is None:
-        end_date = datetime.utcnow()
-        start_date = end_date - timedelta(days=10)
-
-    start_str = start_date.strftime("%Y-%b-%d")
-    end_str = end_date.strftime("%Y-%b-%d")
-
+def get_ephem(start_date, end_date):
+    # Lista de planetas a consultar (por sus IDs en JPL)
     planets = {
         "Mercury": 1,
         "Venus": 2,
@@ -31,20 +23,18 @@ def get_ephem(start_date=None, end_date=None):
 
     rows = []
     for name, pid in planets.items():
-        print(f"🔭 Consultando efemérides de {name} ({pid})...")
-        obj = Horizons(id=pid, location='@sun', epochs={'start': start_str, 'stop': end_str, 'step': '1d'})
+        obj = Horizons(id=pid, location='@sun', epochs={'start': start_date, 'stop': end_date, 'step': '1d'})
         eph = obj.elements()
         df = eph.to_pandas()
         df['planet'] = name
-        for col in ['a', 'e', 'i']:
-            if col not in df.columns:
-                df[col] = None
         rows.append(df[['datetime_str', 'a', 'e', 'i', 'planet']])
 
     all_data = pd.concat(rows)
-    os.makedirs("data/raw", exist_ok=True)
     all_data.to_csv('data/raw/ephem.csv', index=False)
     print("✅ Efemérides guardadas en data/raw/ephem.csv")
 
 if __name__ == "__main__":
-    get_ephem()
+    if len(sys.argv) < 3:
+        print("Uso: python scripts/get_ephem_jpl.py YYYY-MM-DD YYYY-MM-DD")
+    else:
+        get_ephem(sys.argv[1], sys.argv[2])
