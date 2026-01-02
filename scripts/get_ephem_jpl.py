@@ -27,6 +27,9 @@ def get_ephem(start_date, end_date):
         eph = obj.elements()
         df = eph.to_pandas()
         df['planet'] = name
+        for col in ['a', 'e', 'i']:
+           if col not in df.columns:
+              df[col] = None
         rows.append(df[['datetime_str', 'a', 'e', 'i', 'planet']])
 
     all_data = pd.concat(rows)
