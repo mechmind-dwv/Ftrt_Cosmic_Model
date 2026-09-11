@@ -6,4 +6,4 @@ astroquery>=0.4.10,<1
 requests>=2.31,<3
 jupyter>=1.1.1,<2
 notebook>=7,<8
-ipykernel>=6,<7
+ipykernel>=7.3.0,<8
