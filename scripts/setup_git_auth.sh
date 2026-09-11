@@ -1,40 +1,79 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 set -e
 
-echo "🔐 Configuración automática de Git + SSH para GitHub"
-echo "==================================================="
+echo "=========================================="
+echo " FTRT — Git / GitHub SSH"
+echo "=========================================="
 
-EMAIL="ia.mechmind@gmail.com"
-USER="mechmind-dwv"
+EMAIL="${GIT_EMAIL:-ia.mechmind@gmail.com}"
+GITHUB_USER="${GITHUB_USER:-mechmind-dwv}"
+
+git config --global user.email "$EMAIL"
+git config --global user.name "$GITHUB_USER"
+
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+
 KEY="$HOME/.ssh/id_ed25519"
 
-# 1. Git identity
-git config --global user.name "$USER"
-git config --global user.email "$EMAIL"
-
-# 2. SSH key
-if [ ! -f "$KEY" ]; then
-  echo "🔑 Generando clave SSH..."
-  ssh-keygen -t ed25519 -C "$EMAIL" -f "$KEY" -N ""
+if [ -f "$KEY" ]; then
+    echo "✅ Clave SSH existente detectada."
+    echo "♻️ Se reutilizará; no se generará otra."
 else
-  echo "✅ Clave SSH ya existe"
+    echo "🔐 No existe id_ed25519."
+    echo "Generando una nueva clave..."
+
+    ssh-keygen \
+        -t ed25519 \
+        -C "$EMAIL" \
+        -f "$KEY"
 fi
 
-# 3. SSH agent
-eval "$(ssh-agent -s)"
-ssh-add "$KEY"
+eval "$(ssh-agent -s)" >/dev/null 2>&1 || true
 
-# 4. Mostrar clave pública
-echo
-echo "📌 COPIA ESTA CLAVE EN GITHUB → Settings → SSH keys"
-echo "--------------------------------------------------"
-cat "${KEY}.pub"
-echo "--------------------------------------------------"
-echo
+ssh-add "$KEY" 2>/dev/null || true
 
-# 5. Test conexión
-echo "🔍 Probando conexión SSH con GitHub..."
+cat > ~/.ssh/config <<CFG
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+CFG
+
+chmod 600 ~/.ssh/config
+
+echo
+echo "=========================================="
+echo " 🔑 CLAVE PÚBLICA"
+echo "=========================================="
+cat "$KEY.pub"
+
+echo
+echo "=========================================="
+echo " GitHub remoto"
+echo "=========================================="
+
+git remote -v || true
+
+echo
+echo "🧪 Probando autenticación SSH..."
+
 ssh -T git@github.com || true
 
 echo
-echo "✅ SSH configurado. Si ves 'You've successfully authenticated', está listo."
+echo "=========================================="
+echo " IMPORTANTE"
+echo "=========================================="
+echo
+echo "Si GitHub responde:"
+echo
+echo "Hi $GITHUB_USER! You've successfully authenticated..."
+echo
+echo "la autenticación SSH funciona."
+echo
+echo "Si aparece 'Key is invalid', NO generes otra clave."
+echo "Copia exactamente el contenido de:"
+echo
+echo "$KEY.pub"
+echo

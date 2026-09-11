@@ -1,0 +1,9 @@
+> # FTRT Cosmic Model — Manual Termux / Android >
+> ## 1. Objetivo                                >
+> Este documento describe cómo instalar, actualizar, ejecutar y mantener                        > FTRT Cosmic Model desde Android utilizando Termux.
+>                                               > El objetivo es disponer de un entorno reproducible para:                                      >
+> - Descargar datos NOAA/SWPC.                  > - Obtener efemérides mediante JPL Horizons.
+> - Calcular FTRT.                              > - Comparar FTRT con Kp.
+> - Generar gráficos.                           > - Ejecutar notebooks Jupyter.
+> - Sincronizar el proyecto con GitHub mediante SSH.
+>                                               > ---                                           >                                               > # 2. Estructura                               >                                               > ```text                                       > Ftrt_Cosmic_Model/                            > ├── data/                                     > │   ├── raw/                                  > │   └── processed/                            > ├── notebooks/                                > ├── plots/                                    > ├── scripts/                                  > │   ├── setup_termux.sh                       > │   ├── setup_python.sh                       > │   ├── setup_git_auth.sh                     > │   ├── get_noaa_swpc.py                      > │   ├── get_ephem_jpl.py                      > │   ├── compute_ftrt.py                       > │   └── analyze_compare.py                    > ├── environment.yml                           > ├── requirements.txt                          > ├── MANUAL_TERMUX-ANDROID.md                  > ├── README.md                                 > └── run_all.sh
