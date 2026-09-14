@@ -3,7 +3,7 @@
 #
 # requirements.txt solo lista paquetes puros-Python:
 
-astroquery>=0.4.10,<1
+astroquery>=0.4.11,<1
 requests>=2.34.2,<3
 ipykernel>=7.3.0,<8
 notebook>=7,<8
