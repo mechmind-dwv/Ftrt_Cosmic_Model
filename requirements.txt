@@ -5,5 +5,5 @@
 
 astroquery>=0.4.10,<1
 requests>=2.34.2,<3
-ipykernel>=7.3.0,<8
+ipykernel>=7.4.0,<8
 notebook>=7,<8
